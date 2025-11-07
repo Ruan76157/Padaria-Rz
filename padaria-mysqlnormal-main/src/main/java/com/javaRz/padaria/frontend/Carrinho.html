@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carrinho - Padaria RZ</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header>
+    <h1>🥐 Padaria RZ</h1>
+    <div class="header-buttons">
+        <button onclick="window.location.href='Padaria.html'">⬅️ Voltar</button>
+    </div>
+</header>
+
+<div class="cart-container">
+    <h2 style="color: #ff9f00; margin-bottom: 30px;">🛒 Seu Carrinho</h2>
+
+    <div id="cartItems">
+        <!-- Itens do carrinho serão carregados aqui -->
+    </div>
+
+    <div class="cart-total" id="cartTotal">
+        Total: R$ 0,00
+    </div>
+
+    <div class="cart-actions">
+        <button class="btn-limpar" onclick="limparCarrinho()">🗑️ Limpar Carrinho</button>
+        <button class="btn-finalizar" onclick="finalizarCompra()">💳 Finalizar Compra</button>
+    </div>
+</div>
+
+<script>
+    const apiBase = "http://localhost:8081";
+
+    // ========= SISTEMA DE CARRINHO =========
+    const Carrinho = {
+        obter() {
+            const carrinho = localStorage.getItem('carrinho');
+            return carrinho ? JSON.parse(carrinho) : [];
+        },
+        salvar(carrinho) {
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+        },
+        removerItem(produtoId) {
+            let carrinho = this.obter();
+            carrinho = carrinho.filter(item => item.id !== produtoId);
+            this.salvar(carrinho);
+            carregarCarrinho();
+        },
+        atualizarQuantidade(produtoId, novaQuantidade) {
+            const carrinho = this.obter();
+            const item = carrinho.find(i => i.id === produtoId);
+            if (item) {
+                item.quantidade = Math.max(1, novaQuantidade);
+                this.salvar(carrinho);
+                carregarCarrinho();
+            }
+        },
+        limpar() {
+            localStorage.removeItem('carrinho');
+            carregarCarrinho();
+        }
+    };
+
+    // ========= CARREGAR CARRINHO =========
+    function carregarCarrinho() {
+        const carrinho = Carrinho.obter();
+        const container = document.getElementById('cartItems');
+        const totalElement = document.getElementById('cartTotal');
+
+        if (carrinho.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">Seu carrinho está vazio! 😢</p>';
+            totalElement.innerText = 'Total: R$ 0,00';
+            return;
+        }
+
+        let total = 0;
+        container.innerHTML = '';
+
+        carrinho.forEach(item => {
+            const subtotal = item.preco * item.quantidade;
+            total += subtotal;
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'cart-item';
+            itemDiv.innerHTML = `
+                <div>
+                    <h3 style="color: #ff9f00; margin: 0 0 5px 0;">${item.nome}</h3>
+                    <p style="color: #666; margin: 0;">R$ ${item.preco.toFixed(2)} cada</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button onclick="Carrinho.atualizarQuantidade(${item.id}, ${item.quantidade - 1})" style="padding: 5px 10px;">-</button>
+                    <span style="font-weight: bold; min-width: 30px; text-align: center;">${item.quantidade}</span>
+                    <button onclick="Carrinho.atualizarQuantidade(${item.id}, ${item.quantidade + 1})" style="padding: 5px 10px;">+</button>
+                    <span style="min-width: 100px; text-align: right; font-weight: bold;">R$ ${subtotal.toFixed(2)}</span>
+                    <button onclick="Carrinho.removerItem(${item.id})" style="background: #f44336; color: white; padding: 8px 12px;">🗑️</button>
+                </div>
+            `;
+            container.appendChild(itemDiv);
+        });
+
+        totalElement.innerText = `Total: R$ ${total.toFixed(2)}`;
+    }
+
+    // ========= LIMPAR CARRINHO =========
+    function limparCarrinho() {
+        if (confirm('Tem certeza que deseja limpar o carrinho?')) {
+            Carrinho.limpar();
+        }
+    }
+
+    // ========= FINALIZAR COMPRA =========
+    async function finalizarCompra() {
+        const carrinho = Carrinho.obter();
+        const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
+
+        if (!usuario) {
+            alert('⚠️ Você precisa estar logado para finalizar a compra!');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        if (carrinho.length === 0) {
+            alert('🛒 Seu carrinho está vazio!');
+            return;
+        }
+
+        const produtosIds = carrinho.map(item => item.id);
+        const valorTotal = carrinho.reduce((acc, item) => acc + (item.preco * item.quantidade), 0);
+
+        const compraRequest = {
+            usuarioId: usuario.id || usuario.cpf || usuario.email,
+            produtosIds: produtosIds,
+            valorTotal: valorTotal
+        };
+
+        try {
+            // 1️⃣ Envia a compra para o backend
+            const response = await fetch(`${apiBase}/api/compras`, {  // ✅ MUDEI AQUI: /compra → /api/compras
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(compraRequest)
+            });
+
+            if (!response.ok) throw new Error("Erro ao registrar compra");
+
+            // 2️⃣ Atualiza o estoque de cada produto no backend
+            for (const item of carrinho) {
+                const res = await fetch(`${apiBase}/padaria/${item.id}`);
+                if (!res.ok) continue;
+
+                const produto = await res.json();
+                produto.quantidade = Math.max(0, produto.quantidade - item.quantidade);
+
+                await fetch(`${apiBase}/padaria/${item.id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(produto)
+                });
+            }
+
+            // 3️⃣ Limpa o carrinho e confirma visualmente
+            Carrinho.limpar();
+            alert(`✅ Compra finalizada com sucesso!\nTotal: R$ ${valorTotal.toFixed(2)}`);
+
+            // 4️⃣ Volta para a página principal
+            window.location.href = 'Padaria.html';
+
+        } catch (error) {
+            console.error("Erro ao finalizar compra:", error);
+            alert("❌ Ocorreu um erro ao finalizar a compra. Tente novamente.");
+        }
+    }
+
+    // ========= INICIALIZAÇÃO =========
+    document.addEventListener('DOMContentLoaded', carregarCarrinho);
+</script>
+</body>
+</html>

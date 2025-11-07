@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Produtos - Padaria RZ</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header>
+    <h1>🥐 Padaria RZ</h1>
+    <div class="header-buttons">
+        <button id="cartBtn">
+            🛒 Carrinho
+            <span id="cartCount" style="display: none; background: red; color: white; padding: 2px 8px; border-radius: 50%; font-size: 0.8em; margin-left: 5px;">0</span>
+        </button>
+        <button id="profileBtn">👤 Perfil</button>
+        <!-- NOVO: Botão Admin -->
+        <button id="btnAdmin">👤 Admin</button>
+
+        <!-- Menu dropdown do perfil -->
+        <div id="profileMenu" class="profile-menu hidden">
+            <div class="profile-info">
+                <h3 id="userName">Visitante</h3>
+                <p><strong>Email:</strong> <span id="userEmail">-</span></p>
+                <p><strong>CPF:</strong> <span id="userCpf">-</span></p>
+                <p><strong>Telefone:</strong> <span id="userTelefone">-</span></p>
+            </div>
+            <button id="logoutBtn" style="width: 100%; margin-top: 10px;">Sair</button>
+        </div>
+    </div>
+</header>
+
+<section class="products-section">
+    <!-- O painel administrativo será inserido aqui automaticamente pelo JavaScript -->
+
+    <h2>Nossos Produtos</h2>
+    <div id="productsContainer">
+        <!-- Produtos serão carregados aqui via JavaScript -->
+        <p>Carregando produtos...</p>
+    </div>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
