@@ -46,6 +46,7 @@ public class PadariaController {
         return ResponseEntity.noContent().build();
     }
 
+
     @PutMapping("/{id}/ajustar-estoque")
     public ResponseEntity<Void> ajustarEstoque(@PathVariable String id, @RequestParam int quantidade) { // Mude para String
         padariaService.ajustarEstoque(id, quantidade);
