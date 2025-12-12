@@ -24,22 +24,22 @@ public class PadariaService {
     private final PadariaRepository padariaRepository;
     private final String UPLOAD_DIR = "uploads/";
 
-    // MÉTODO ANTIGO (mantido para compatibilidade)
+
     public Padaria salvarPadaria(Padaria padaria) {
         return padariaRepository.save(padaria);
     }
 
-    // NOVO MÉTODO para upload de imagem
+
     public Padaria criarProdutoComImagem(ProdutoRequest request) throws IOException {
         String imagemUrl = null;
 
-        // Salvar imagem se existir
+
         if (request.getImagem() != null && !request.getImagem().isEmpty()) {
             imagemUrl = salvarImagem(request.getImagem());
             log.info("Imagem salva: {}", imagemUrl);
         }
 
-        // Criar produto
+
         Padaria produto = Padaria.builder()
                 .nome(request.getNome())
                 .preco(request.getPreco())
@@ -53,13 +53,13 @@ public class PadariaService {
     }
 
     private String salvarImagem(MultipartFile imagem) throws IOException {
-        // Criar diretório se não existir
+
         Path uploadPath = Paths.get(UPLOAD_DIR);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
-        // Gerar nome único
+
         String nomeOriginal = imagem.getOriginalFilename();
         String extensao = "";
         if (nomeOriginal != null && nomeOriginal.contains(".")) {
@@ -67,14 +67,14 @@ public class PadariaService {
         }
         String nomeArquivo = UUID.randomUUID().toString() + extensao;
 
-        // Salvar arquivo
+
         Path filePath = uploadPath.resolve(nomeArquivo);
         Files.copy(imagem.getInputStream(), filePath);
 
         return "/uploads/" + nomeArquivo;
     }
 
-    // MÉTODOS EXISTENTES (atualizados para String id)
+
     public Padaria buscarPorId(String id) {
         return padariaRepository.findById(Integer.valueOf(id))
                 .orElseThrow(() -> new RuntimeException("Item de padaria não encontrado com Id: " + id));
@@ -94,7 +94,7 @@ public class PadariaService {
         existente.setDescricao(novaPadaria.getDescricao());
         existente.setCategoria(novaPadaria.getCategoria());
 
-        // Atualiza imagem URL apenas se for fornecida
+
         if (novaPadaria.getImagemUrl() != null) {
             existente.setImagemUrl(novaPadaria.getImagemUrl());
         }

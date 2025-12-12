@@ -19,7 +19,7 @@ public enum UserRole {
     @JsonCreator
     public static UserRole fromValue(String value) {
         if (value == null || value.isBlank()) {
-            return null; // pode retornar null se o campo não vier preenchido
+            return null;
         }
         for (UserRole role : UserRole.values()) {
             if (role.role.equalsIgnoreCase(value)) {

@@ -39,23 +39,23 @@ public class SecurityConfigurations {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // H2 Console
+
                         .requestMatchers("/h2-console/**").permitAll()
 
-                        // Rotas antigas (sem /api)
+
                         .requestMatchers("/usuario/**").permitAll()
                         .requestMatchers("/cadastro/**").permitAll()
                         .requestMatchers("/padaria/**").permitAll()
                         .requestMatchers("/compras/**").permitAll()
 
-                        // Rotas da API (com /api)
+
                         .requestMatchers("/api/usuarios/**").permitAll()
                         .requestMatchers("/api/cadastros/**").permitAll()
                         .requestMatchers("/api/padarias/**").permitAll()
                         .requestMatchers("/api/compras/**").permitAll()
-                        .requestMatchers("/api/produtos/**").permitAll() // ADICIONEI ESTA LINHA
+                        .requestMatchers("/api/produtos/**").permitAll()
 
-                        // Uploads e arquivos estáticos
+
                         .requestMatchers("/uploads/**").permitAll()
 
                         .anyRequest().authenticated()

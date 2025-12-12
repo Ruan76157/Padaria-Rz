@@ -9,7 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class CompraRequestDTO {
-    private String usuarioCpf;       // CPF do usuário
-    private List<String> produtosIds; // IDs dos produtos
-    private Double valorTotal;        // Opcional
+    private String usuarioCpf;
+    private List<String> produtosIds;
+    private Double valorTotal;
 }

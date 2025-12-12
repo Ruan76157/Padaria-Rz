@@ -26,20 +26,20 @@ public class ProdutoUploadController {
                 return ResponseEntity.badRequest().body("Arquivo vazio");
             }
 
-            // Gerar nome único
+
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             Path caminho = Paths.get(UPLOAD_DIR + fileName);
 
-            // Criar diretório se não existir
+
             File diretorio = new File(UPLOAD_DIR);
             if (!diretorio.exists()) {
                 diretorio.mkdirs();
             }
 
-            // Salvar imagem
+
             Files.write(caminho, file.getBytes());
 
-            // URL final da imagem
+
             String url = "http://localhost:8081/uploads/" + fileName;
 
             return ResponseEntity.ok(url);

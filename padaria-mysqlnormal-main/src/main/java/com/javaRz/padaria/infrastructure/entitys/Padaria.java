@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Document(collection = "padarias")
 public class Padaria {
         @Id
-        private String id; // MUDEI para String - MongoDB gera automaticamente
+        private String id;
         private String nome;
         private Double preco;
         private Integer quantidade;

@@ -15,7 +15,7 @@ public class UsuarioService {
     private final SequenceGeneratorService sequenceGeneratorService;
 
     public void salvarUsuario(Usuario usuario) {
-        // Se o usuário ainda não tem ID, gera um novo
+
         if (usuario.getId() == null) {
             usuario.setId(sequenceGeneratorService.getSequenceNumber(Usuario.SEQUENCE_NAME));
         }

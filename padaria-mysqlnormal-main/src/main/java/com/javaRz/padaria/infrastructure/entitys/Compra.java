@@ -11,14 +11,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Document(collection = "compras") // ✅ Nome da coleção Mongo
+@Document(collection = "compras")
 public class Compra {
 
     @Id
-    private String id; // Mongo usa String (ObjectId)
+    private String id;
 
     private String usuarioCpf;
-    private List<String> produtosIds; // Armazena apenas os IDs dos produtos
+    private List<String> produtosIds;
     private LocalDateTime dataCompra;
     private Double valorTotal;
 }

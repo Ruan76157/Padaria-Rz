@@ -20,7 +20,7 @@ public class CompraService {
     public Compra criarCompraComDTO(CompraRequestDTO dto) {
         log.info("📦 Criando compra (MongoDB) com DTO: {}", dto);
 
-        // Calcula o valor total se não vier
+
         Double valorTotal = dto.getValorTotal();
         if (valorTotal == null || valorTotal == 0) {
             log.warn("⚠️ Valor total não informado, definindo como 0");
